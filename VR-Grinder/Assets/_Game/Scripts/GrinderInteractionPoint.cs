@@ -13,9 +13,17 @@ public class GrinderInteractionPoint : MonoBehaviour
     [SerializeField]
     private GameObject _cuttingIndicator;
 
+    [SerializeField]
+    private GameObject _sparks;
+
     private float _cuttingProgress;
     private GrinderBlade _grinderBlade;
     private bool _isCut = false;
+
+    private void Start()
+    {
+        _sparks.gameObject.SetActive(false);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -35,6 +43,7 @@ public class GrinderInteractionPoint : MonoBehaviour
         if(other.CompareTag("Grinder") && other.GetComponent<GrinderBlade>() == _grinderBlade)
         {
             _grinderBlade = null;
+            TurnSparks(false);
         }
     }
 
@@ -45,22 +54,26 @@ public class GrinderInteractionPoint : MonoBehaviour
             return;
         }
 
-        if (other.CompareTag("Grinder") && _grinderBlade != null && _grinderBlade.GrinderController.IsWorking)
+        if (other.CompareTag("Grinder") && _grinderBlade != null && _grinderBlade.GrinderController.IsWorking && _grinderBlade.GrinderController.MainGrabbingPoint.IsGrabbed && _grinderBlade.GrinderController.SecondaryGrabbingPoint.IsGrabbed)
         {
             _cuttingProgress += Time.deltaTime;
-            Debug.LogError(_cuttingProgress);
+            TurnSparks(true);
 
             if (_cuttingProgress >= _cuttingProgressNeeded)
             {
-                Debug.LogError("Cut!");
                 FinalizeCut();
             }
+        }
+        else if(other.CompareTag("Grinder") && _grinderBlade != null)
+        {
+            TurnSparks(false);
         }
     }
 
     private void FinalizeCut()
     {
         _isCut = true;
+        TurnSparks(false);
 
         for (int i = 0; i < _rigidbodyList.Count; i++)
         {
@@ -68,5 +81,10 @@ public class GrinderInteractionPoint : MonoBehaviour
             _rigidbodyList[i].useGravity = true;
             _cuttingIndicator.SetActive(false);
         }
+    }
+
+    private void TurnSparks(bool value)
+    {
+        _sparks.gameObject.SetActive(value);
     }
 }

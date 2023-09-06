@@ -65,7 +65,7 @@ public class GrabbingPoint : MonoBehaviour
 
         if (_grabbedWithRight)
         {
-            if (_handsManager.GetRightHandGrabbingPressed())
+            if (!_handsManager.GetRightHandGrabbingPressed())
             {
                 Ungrab();
             }
@@ -76,22 +76,15 @@ public class GrabbingPoint : MonoBehaviour
     {
         _isGrabbed = true;
 
-        if(_grinderController.transform.parent == null)
-        {
-            _grinderController.transform.SetParent(other.gameObject.transform);
-            _grinderController.Rigidbody.isKinematic = true;
-            _grinderController.Rigidbody.useGravity = false;
-        }
-      
+        _grinderController.ParentGrinder(other.transform);
     }
 
     private void Ungrab()
     {
         _isGrabbed = false;
-        _grabbedWithLeft = false;
         _grabbedWithRight = false;
-        _grinderController.transform.parent = null;
-        _grinderController.Rigidbody.isKinematic = false;
-        _grinderController.Rigidbody.useGravity = true;
+        _grabbedWithLeft = false;
+
+        _grinderController.UnparentGrinder();
     }
 }

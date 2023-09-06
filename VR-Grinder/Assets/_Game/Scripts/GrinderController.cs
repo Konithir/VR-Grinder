@@ -12,6 +12,9 @@ public class GrinderController : MonoBehaviour
     private Animator _grinderAnimator;
 
     [SerializeField]
+    private Animator _bladeAnimator;
+
+    [SerializeField]
     private AudioSource _audioSource;
 
     [SerializeField]
@@ -63,10 +66,11 @@ public class GrinderController : MonoBehaviour
 
     private void GrinderWorking()
     {
-        if (_handsManager.GetLeftHandPrimaryPressed() && _handsManager.GetRightHandPrimaryPressed())
+        if (_handsManager.GetLeftHandPrimaryPressed() || _handsManager.GetRightHandPrimaryPressed())
         {
             OnGrinderWorking?.Invoke();
-            _grinderAnimator.SetBool("Grinding", true);          
+            _grinderAnimator.SetBool("Grinding", true);
+            _bladeAnimator.SetBool("Grinding", true);
 
             if(!_isWorking)
             {
@@ -90,5 +94,27 @@ public class GrinderController : MonoBehaviour
 
         _isWorking = false;
         _grinderAnimator.SetBool("Grinding", false);
+        _bladeAnimator.SetBool("Grinding", false);
+    }
+
+    public void UnparentGrinder()
+    {
+        if(!_mainGrabbingPoint.IsGrabbed && !SecondaryGrabbingPoint.IsGrabbed)
+        {
+            transform.parent = null;
+            Rigidbody.isKinematic = false;
+            Rigidbody.useGravity = true;
+        }
+    }
+
+    public void ParentGrinder(Transform newParent)
+    {
+        if (transform.parent == null)
+        {
+            transform.localEulerAngles = newParent.transform.eulerAngles;
+            transform.SetParent(newParent);
+            Rigidbody.isKinematic = true;
+            Rigidbody.useGravity = false;
+        }
     }
 }
