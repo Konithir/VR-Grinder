@@ -28,7 +28,7 @@ public class GrinderController : MonoBehaviour
 
     private bool _isWorking;
     private Vector3 _direction;
-    private Vector3 _rotationOffset = new Vector3(0,-90,0);
+    private Vector3 _rotationOffset = new Vector3(0,-105,0);
     private Vector3 _tempRotation;
 
     public UnityEvent OnGrinderWorking;
