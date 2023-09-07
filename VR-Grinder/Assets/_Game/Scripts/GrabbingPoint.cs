@@ -34,19 +34,23 @@ public class GrabbingPoint : MonoBehaviour
         CheckForGrab(other);
     }
 
-  
-
     private void CheckForGrab(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            if (_handsManager.GetLeftHandGrabbingPressed() || _handsManager.GetRightHandGrabbingPressed())
+            if ((_handsManager.GetLeftHandGrabbingPressed() && !_handsManager.LeftHandOccupied) || (_handsManager.GetRightHandGrabbingPressed() && !_handsManager.RightHandOccupied))
             {
                 if(_handsManager.GetLeftHandGrabbingPressed())
+                {
                     _grabbedWithLeft = true;
+                    _handsManager.LeftHandOccupied = true;
+                }
 
                 if(_handsManager.GetRightHandGrabbingPressed())
+                {
                     _grabbedWithRight = true;
+                    _handsManager.RightHandOccupied = true;
+                }          
 
                 Grab(other);
             }
@@ -59,6 +63,7 @@ public class GrabbingPoint : MonoBehaviour
         {
             if(!_handsManager.GetLeftHandGrabbingPressed())
             {
+                _handsManager.LeftHandOccupied = false;
                 Ungrab();
             }
         }
@@ -67,6 +72,7 @@ public class GrabbingPoint : MonoBehaviour
         {
             if (!_handsManager.GetRightHandGrabbingPressed())
             {
+                _handsManager.RightHandOccupied = false;
                 Ungrab();
             }
         }

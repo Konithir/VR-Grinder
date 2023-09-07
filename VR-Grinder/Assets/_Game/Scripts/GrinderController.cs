@@ -27,6 +27,9 @@ public class GrinderController : MonoBehaviour
     private Rigidbody _rigidBody;
 
     private bool _isWorking;
+    private Vector3 _direction;
+    private Vector3 _rotationOffset = new Vector3(0,-90,0);
+    private Vector3 _tempRotation;
 
     public UnityEvent OnGrinderWorking;
     public UnityEvent OnGrinderStartWorking;
@@ -54,13 +57,34 @@ public class GrinderController : MonoBehaviour
 
     private void Update()
     {
-        if(_mainGrabbingPoint.IsGrabbed)
+        CheckGrinderWorking();
+        CheckForRotation();
+    }
+
+    private void CheckGrinderWorking()
+    {
+        if (_mainGrabbingPoint.IsGrabbed)
         {
             GrinderWorking();
         }
         else
         {
             StopGrindingWork();
+        }
+    }
+
+    private void CheckForRotation()
+    {
+        if(MainGrabbingPoint.IsGrabbed && SecondaryGrabbingPoint.IsGrabbed)
+        {
+            _direction = (_handsManager.RightHand.transform.localPosition - _handsManager.LeftHand.transform.localPosition).normalized;
+            _tempRotation = Quaternion.LookRotation(_direction).eulerAngles + _rotationOffset;
+            _tempRotation = new Vector3(-_tempRotation.x,_tempRotation.y,_tempRotation.z);
+            transform.localEulerAngles = _tempRotation;
+        }
+        else if((MainGrabbingPoint.IsGrabbed || SecondaryGrabbingPoint.IsGrabbed) && transform.parent != null)
+        {
+            transform.localEulerAngles = transform.parent.localEulerAngles;
         }
     }
 
@@ -113,6 +137,7 @@ public class GrinderController : MonoBehaviour
         {
             transform.localEulerAngles = newParent.transform.eulerAngles;
             transform.SetParent(newParent);
+            transform.localPosition = MainGrabbingPoint.transform.localPosition;
             Rigidbody.isKinematic = true;
             Rigidbody.useGravity = false;
         }
